@@ -1,0 +1,37 @@
+version: "3.6"
+networks:
+  proxy:
+    driver: bridge
+    name: proxy
+  internal:
+    external: false
+    name: internal
+services:
+  traefik:
+    container_name: traefik
+    restart: unless-stopped # Set to 'always' for automatically restart
+    image: traefik:v2.10
+    ports:
+      - 80:80
+      - 8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./docker/config/traefik/traefik.toml:/etc/traefik/traefik.toml:rw
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.api.rule=Host(`traefik.local`)
+      - traefik.http.routers.api.entrypoints=web
+      - traefik.http.routers.api.service=api@internal
+      - traefik.docker.network=proxy
+      - traefik.port=8080
+    networks:
+      - proxy
+      - internal
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 250M
+        reservations:
+          cpus: '0.125'
+          memory: 125M

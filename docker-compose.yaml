@@ -1,0 +1,59 @@
+version: "3.6"
+networks:
+  proxy:
+    external: true
+    name: proxy
+  internal:
+    external: false
+    name: internal
+volumes:
+  data-db:
+services:
+  nodejs:
+    restart: unless-stopped # Set to 'always' for automatically restart
+    build: 
+      context: .
+    tty: true
+    ports:
+      - 80:3000
+    depends_on:
+      - mongodb
+    command:
+      - bash
+      - -c
+      - "npm run docker:${app_env}"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.nginx.rule=Host(`${domain}`)
+      - traefik.http.routers.nginx.entrypoints=web
+      - traefik.port=80
+    networks:
+      - proxy
+      - internal
+    deploy:
+      resources:
+        limits:
+          cpus: '${nodejs_cpus_limit}'
+          memory: ${nodejs_memory_limit}
+        reservations:
+          cpus: '${nodejs_cpus_request}'
+          memory: ${nodejs_memory_request}
+  mongodb:
+    image: mongo:4.2.1-bionic
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${mongodb_username}
+      MONGO_INITDB_ROOT_PASSWORD: ${mongodb_password}
+    volumes:
+      - data-db:/data/db:rw
+    networks:
+      - internal
+    deploy:
+      resources:
+        limits:
+          cpus: '${mongodb_cpus_limit}'
+          memory: ${mongodb_memory_limit}
+        reservations:
+          cpus: '${mongodb_cpus_request}'
+          memory: ${mongodb_memory_request}

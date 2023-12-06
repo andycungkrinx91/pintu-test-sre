@@ -1,0 +1,33 @@
+{{- if .Values.keda.enabled }}
+apiVersion: keda.sh/v1alpha1                 
+kind: ScaledObject
+metadata:                                     
+  name: {{ include "nodejs.fullname" . }}
+spec:
+  scaleTargetRef:
+    name: {{ include "nodejs.fullname" . }}
+  pollingInterval: 30           
+  cooldownPeriod:  120     
+  minReplicaCount: {{ .Values.keda.resources.minReplica }}             
+  maxReplicaCount: {{ .Values.keda.resources.maxReplica }}
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown:
+          {{- with .Values.keda.scaledownPolicies }}
+          policies:
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
+        scaleUp:
+          {{- with .Values.keda.scaleupPolicies }}
+          policies:
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
+  triggers:
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-server
+      metricName: container_memory_usage_bytes
+      query: sum(container_memory_usage_bytes{container="{{ include "nodejs.fullname" . }}"}) #fetch from memory usage
+      threshold: '{{ .Values.keda.resources.threshold }}'
+{{- end }}

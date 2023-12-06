@@ -14,7 +14,9 @@
    - https://github.com/andycungkrinx91/pintu-test-sre/blob/master/Dockerfile (dockerfile for build)
 
 2. Create CI/CD start from:
-   a. 
+   a. - https://github.com/andycungkrinx91/pintu-test-sre/blob/master/run.sh (for build and run. access from browser http://localhost/v1/docs/ for test )
+      - https://github.com/andycungkrinx91/pintu-test-sre/blob/master/test-run.sh (for build test. run 'docker logs pintu-test-sre_nodejs_1' for check all test )
+   
 
 ```
 

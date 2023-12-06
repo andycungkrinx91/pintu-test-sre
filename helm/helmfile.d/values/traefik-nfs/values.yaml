@@ -1,0 +1,12 @@
+persistence:
+  enabled: true
+  storageClass: "standard"
+  size: 1Gi
+
+storageClass:
+  name: traefik-nfs
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 500Mi

@@ -1,0 +1,44 @@
+fullnameOverride: "nodejs-pintu-test"
+replicaCount: 1
+resources:
+  requests:
+    cpu: 10m
+    memory: 50Mi
+service:
+  type: ClusterIP
+  port: 80
+env:
+  port: 3000
+  appEnv: dev
+ingress:
+  enabled: false
+imageCreds:
+  enabled: true
+  secretsName: default
+nodeSelector: {}
+nodejs:
+  image:
+    tag: latest
+    repository: docker.io/andycungkrinx91/nodejs-pintu
+    pullPolicy: IfNotPresent
+resources:
+  requests:
+    cpu: 200m
+    memory: 300Mi
+  limits:
+    cpu: 400m
+    memory: 600Mi
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 2
+  cpuAverageUtilization: 75
+  memoryAverageUtilization: 75
+  scaleDownPolicies:
+    podValues: 1
+    periodSecond: 300
+    stabilizationWindowSeconds: 300
+  scaleUpPolicies:
+    podValues: 2
+    periodSecond: 30
+    stabilizationWindowSeconds: 0

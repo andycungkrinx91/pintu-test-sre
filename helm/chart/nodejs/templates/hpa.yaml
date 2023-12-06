@@ -1,0 +1,45 @@
+{{- if .Values.autoscaling.enabled }}
+{{- $hpa := .Values.autoscaling -}}
+{{- $scaleDownPolicy := .Values.autoscaling.scaleDownPolicies -}}
+{{- $scaleUpPolicy := .Values.autoscaling.scaleUpPolicies -}}
+
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "nodejs.fullname" . }}
+  labels:
+    {{- include "nodejs.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "nodejs.fullname" . }}
+  minReplicas: {{ $hpa.minReplicas }}
+  maxReplicas: {{ $hpa.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ $hpa.cpuAverageUtilization | default "50" }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization 
+          averageUtilization: {{ $hpa.memoryAverageUtilization | default "50" }}
+  behavior:
+    scaleDown:
+      policies:
+      - type: Pods
+        value: {{ $scaleDownPolicy.podValues | default "1" }}
+        periodSeconds: {{ $scaleDownPolicy.periodSecond | default "60" }}
+      stabilizationWindowSeconds: {{ $scaleDownPolicy.stabilizationWindowSeconds | default "300" }}
+    scaleUp:
+      policies:
+      - type: Pods
+        value: {{ $scaleUpPolicy.podValues | default "1" }}
+        periodSeconds: {{ $scaleUpPolicy.periodSecond | default "60" }}
+      stabilizationWindowSeconds: {{ $scaleUpPolicy.stabilizationWindowSeconds | default "0" }}
+{{- end }}

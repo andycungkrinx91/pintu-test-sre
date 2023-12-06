@@ -1,0 +1,122 @@
+# Based on Containous Helm chart, source --> https://github.com/containous/traefik-helm-chart/tree/master/traefik
+# Default values for Traefik
+image:
+  name: traefik
+
+#
+# Configure the deployment
+#
+deployment:
+  enabled: true
+  # Number of pods of the deployment
+  replicas: 1
+  # Additional deployment annotations (e.g. for jaeger-operator sidecar injection)
+  annotations: {}
+  # Additional pod annotations (e.g. for mesh injection or prometheus scraping)
+  podAnnotations: 
+    prometheus.io/port: "8082"
+    prometheus.io/scrape: "true"
+
+# Create an IngressRoute for the dashboard
+ingressRoute:
+  dashboard:
+    enabled: false
+    # Additional ingressRoute annotations (e.g. for kubernetes.io/ingress.class)
+    annotations: {}
+    # Additional ingressRoute labels (e.g. for filtering IngressRoute by custom labels)
+    labels: {}
+
+rollingUpdate:
+  maxUnavailable: 1
+  maxSurge: 1
+
+#
+# Configure Traefik static configuration
+# Additional arguments to be passed at Traefik's binary
+# All available options available on https://docs.traefik.io/reference/static-configuration/cli/
+## Use curly braces to pass values: `helm install --set="additionalArguments={--providers.kubernetesingress.ingressclass=traefik-internal,--log.level=DEBUG}"`
+additionalArguments:
+  - "--providers.kubernetesingress=true"
+  - "--api.dashboard=true"
+  - "--serverstransport.insecureskipverify=true"
+  - "--entryPoints.web.forwardedHeaders.insecure=true"
+  - "--metrics.prometheus=true"
+  - "--entryPoints.metrics.address=:8082"
+  - "--metrics.prometheus.entryPoint=metrics"
+  - "--metrics.prometheus.addServicesLabels=true"
+  - "--metrics.prometheus.addEntryPointsLabels=true"
+  - "--certificatesresolvers.stagingresolver.acme.httpchallenge.entrypoint=web"
+  - "--certificatesresolvers.stagingresolver.acme.email=test@pintu.com"
+  - "--certificatesresolvers.stagingresolver.acme.storage=/data/acme.json"
+  - "--certificatesresolvers.stagingresolver.acme.dnschallenge.provider=namecheap"
+  - "--certificatesresolvers.stagingresolver.acme.dnschallenge.delaybeforecheck=60"
+  - "--certificatesresolvers.stagingresolver.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53"
+  - "--entryPoints.name.transport.respondingTimeouts.idleTimeout=600"
+  - "--entryPoints.name.transport.respondingTimeouts.writeTimeout=600"
+  - "--entryPoints.name.transport.respondingTimeouts.readTimeout=600"
+
+# Environment variables to be passed to Traefik's binary
+
+# - name: SOME_VAR
+#   value: some-var-value
+envFrom: []
+# - configMapRef:
+#     name: config-map-name
+# - secretRef:
+#     name: secret-name
+ports:
+  traefik:
+    expose: false
+  web:
+    port: 8000
+    expose: true
+    exposedPort: 80
+  websecure:
+    port: 8443
+    expose: true
+    exposedPort: 443
+
+service:
+  enabled: true
+  type: LoadBalancer
+  spec: 
+    externalTrafficPolicy: Local
+    loadBalancerIP: "xxx.xxx.xxx.xxx" # change your IP address
+
+persistence:
+  enabled: true #enabled to store acme certificate data
+  accessMode: ReadWriteMany
+  size: 800Mi
+  # existingClaim: traefik-nfs-server
+  storageClass: "traefik-nfs"
+  path: /data
+  annotations: {}
+  # subPath: "" # only mount a subpath of the Volume into the pod
+
+resources:
+  requests:
+    cpu: "150m"
+    memory: "500Mi"
+  # limits:
+  #   cpu: "300m"
+  #   memory: "150Mi"
+nodeSelector: {}
+tolerations: []
+
+# Pods can have priority.
+# Priority indicates the importance of a Pod relative to other Pods.
+priorityClassName: ""
+
+# Set the container security context
+# To run the container with ports below 1024 this will need to be adjust to run as root
+securityContext:
+  capabilities:
+    drop: [ALL]
+  readOnlyRootFilesystem: false
+  runAsGroup: 0
+  runAsNonRoot: false
+  runAsUser: 0
+
+podSecurityContext:
+  # fsGroup: 65532 #first install: "65532" than helm upgrade, change to "null"
+  fsGroup: null #first install: "65532" than helm upgrade, change to "null"

@@ -1,0 +1,60 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ include "nodejs.fullname" . }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "nodejs.fullname" . }}
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      annotations:
+      {{- with .Values.podAnnotations }}  
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      checksum/env: {{ include (print $.Template.BasePath "/configmap/env.yaml") . | sha256sum }}
+      labels:
+        app: {{ include "nodejs.fullname" . }}
+        component: {{ include "nodejs.fullname" . }}
+        chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+        heritage: {{ .Release.Service }}
+        release: {{ .Release.Name }}
+    spec:
+      volumes:
+        - name: env-volume
+          configMap:
+            name: {{ include "nodejs.fullname" . }}-env
+      containers:
+      - name: {{ include "nodejs.fullname" . }}
+        image: "{{ .Values.nodejs.image.repository }}:{{ .Values.nodejs.image.tag }}"
+        imagePullPolicy: {{ .Values.nodejs.image.pullPolicy }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        ports:
+          - name: nodejs
+            containerPort: 3000
+            protocol: TCP
+        volumeMounts:
+          - name: env-volume
+            mountPath: /usr/src/node-app/.env
+            subPath: .env
+        env:
+          - name: "APP_ENV"
+            value: "{{ .Values.env.appEnv }}"
+        command:
+          - bash
+          - -c
+          - "npm run {{ .Values.env.appEnv }}"
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{ if .Values.imageCreds.enabled }}
+      imagePullSecrets:
+      - name: {{ .Values.imageCreds.secretsName }}
+      {{ end }}        
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

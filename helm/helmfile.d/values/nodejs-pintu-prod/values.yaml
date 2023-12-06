@@ -9,10 +9,10 @@ service:
   port: 80
 env:
   port: 3000
-  appEnv: test
+  appEnv: prod
 ingress:
   enabled: true
-  host: prod.pintu.com
+  host: xip.io
   certResolver: stagingresolver
 imageCreds:
   enabled: true

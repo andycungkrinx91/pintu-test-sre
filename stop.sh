@@ -1,5 +1,3 @@
 #! /bin/sh
 # Traefik
-docker-compose --compatibility -f docker-compose-traefik.yaml \
--f docker-compose.yaml \
-down
+docker-compose --compatibility -f docker-compose.yaml down

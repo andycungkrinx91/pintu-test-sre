@@ -22,7 +22,7 @@ services:
     command:
       - bash
       - -c
-      - "npm run ${app_env}"
+      - "npm run test"
     networks:
       - node-network
     deploy:

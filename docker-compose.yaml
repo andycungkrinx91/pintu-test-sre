@@ -9,6 +9,7 @@ services:
     restart: unless-stopped # Set to 'always' for automatically restart
     build: 
       context: .
+    user: "${UID}:${GID}"
     tty: true
     ports:
       - 80:3000
@@ -35,10 +36,12 @@ services:
           memory: ${nodejs_memory_request}
   mongodb:
     image: mongo:4.2.1-bionic
+    restart: unless-stopped # Set to 'always' for automatically restart
+    user: "${UID}:${GID}"
     ports:
       - 27017:27017
     volumes:
-      - ./data-db:/data/db:rw
+      - ${db_source}:/data/db:rw
     networks:
       - node-network
     deploy:

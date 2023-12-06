@@ -28,6 +28,7 @@
 
 3. - https://github.com/andycungkrinx91/pintu-test-sre/blob/master/helm/chart/nodejs/templates/ingress.yaml (traefik ingressroute)
    - https://github.com/andycungkrinx91/pintu-test-sre/blob/master/helm/helmfile.d/values/traefik/values.yaml#L84 (public IP for pointing domain)
+   - https://github.com/andycungkrinx91/pintu-test-sre/blob/master/helm/helmfile.d/values/nodejs-pintu-prod/values.yaml#L15 (domain xip.io)
 
 4. Techstack list:
    - Docker

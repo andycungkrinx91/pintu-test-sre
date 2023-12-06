@@ -9,7 +9,7 @@ service:
   port: 80
 env:
   port: 3000
-  appEnv: dev
+  appEnv: test
 ingress:
   enabled: false
 imageCreds:

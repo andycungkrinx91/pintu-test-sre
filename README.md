@@ -17,7 +17,7 @@
    a. - https://github.com/andycungkrinx91/pintu-test-sre/blob/master/run.sh (for build and run. access from browser http://localhost/v1/docs/ for test )
       - https://github.com/andycungkrinx91/pintu-test-sre/blob/master/test-run.sh (for build test. run 'docker logs pintu-test-sre_nodejs_1' for check all test )
    b. https://github.com/andycungkrinx91/pintu-test-sre/blob/master/.pipeline-example/build.sh#L14 (just run 'bash .pipeline-example/build.sh' for build and pust to registry)
-   c. https://github.com/andycungkrinx91/pintu-test-sre/blob/master/.pipeline-example/build.sh#L15
+   c. https://github.com/andycungkrinx91/pintu-test-sre/blob/master/.pipeline-example/build.sh#L15-L17 (registry https://hub.docker.com/r/andycungkrinx91/nodejs-pintu)
    d. - https://github.com/andycungkrinx91/pintu-test-sre/tree/master/helm/chart/nodejs (helm chart)
       - https://github.com/andycungkrinx91/pintu-test-sre/blob/master/helm/helmfile.d/pintu-test.yaml (helmfile cluster)
       - https://github.com/andycungkrinx91/pintu-test-sre/tree/master/helm/helmfile.d/values/traefik (helm values traefik)

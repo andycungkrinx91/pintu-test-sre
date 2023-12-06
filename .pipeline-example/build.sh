@@ -13,3 +13,5 @@ docker login $REGISTRY_URL -u $USERNAME -p $TOKEN
 # Build apps image
 docker build -t andycungkrinx91/nodejs-pintu:$githead-$bid -f Dockerfile .
 docker push andycungkrinx91/nodejs-pintu:$githead-$bid
+docker tag andycungkrinx91/nodejs-pintu:$githead-$bid andycungkrinx91/nodejs-pintu:latest
+docker push andycungkrinx91/nodejs-pintu:latest
